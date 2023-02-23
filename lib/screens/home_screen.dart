@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:todo_bloc_app/bloc/todo/todo_bloc.dart';
+import 'package:todo_bloc_app/bloc/todo_filters/todos_filters_bloc.dart';
+
+import 'package:todo_bloc_app/models/todos_filter_model.dart';
 import 'package:todo_bloc_app/models/todos_model.dart';
 import 'package:todo_bloc_app/screens/add_todo_screen.dart';
 
@@ -9,23 +12,44 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Bloc Pattern: TODO"),
-        actions: [
-          IconButton(
-            onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => const AddTodoScreen(),
-                ),
-              );
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text("Bloc Pattern: TODO"),
+          actions: [
+            IconButton(
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => const AddTodoScreen(),
+                  ),
+                );
+              },
+              icon: const Icon(Icons.add),
+            )
+          ],
+          bottom: TabBar(
+            onTap: (tabIndex) {
+              switch (tabIndex) {
+                case 0:
+                  BlocProvider.of<TodosFiltersBloc>(context)
+                      .add(const UpdateTodos(todoFilter: TodosFilter.pending));
+                  break;
+                case 1:
+                  BlocProvider.of<TodosFiltersBloc>(context).add(
+                      const UpdateTodos(todoFilter: TodosFilter.completed));
+                  break;
+              }
             },
-            icon: const Icon(Icons.add),
-          )
-        ],
+            tabs: const [
+              Tab(icon: Icon(Icons.pending)),
+              Tab(icon: Icon(Icons.add_task)),
+            ],
+          ),
+        ),
+        body: _todos(),
       ),
-      body: _todos(),
     );
   }
 
