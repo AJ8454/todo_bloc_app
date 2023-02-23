@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:todo_bloc_app/bloc/my_bloc_observer.dart';
 import 'package:todo_bloc_app/bloc/todo/todo_bloc.dart';
+import 'package:todo_bloc_app/bloc/todos_filters/todos_filters_bloc.dart';
 
 import 'package:todo_bloc_app/screens/home_screen.dart';
 
@@ -18,9 +19,13 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (context) => TodosBloc()..add(const LoadTodos()))
+        BlocProvider(create: (context) => TodosBloc()..add(const LoadTodos())),
+        BlocProvider(
+            create: (context) => TodosFiltersBloc(
+                todosBloc: BlocProvider.of<TodosBloc>(context))),
       ],
       child: MaterialApp(
+        debugShowCheckedModeBanner: false,
         title: 'Flutter Demo',
         theme: ThemeData(
           primarySwatch: Colors.blue,

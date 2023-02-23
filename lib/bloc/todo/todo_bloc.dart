@@ -17,9 +17,29 @@ class TodosBloc extends Bloc<TodoEvent, TodosState> {
     emit(TodoLoaded(todos: event.todos));
   }
 
-  void _onAddTodos(AddTodos event, Emitter<TodosState> emit) {}
+  void _onAddTodos(AddTodos event, Emitter<TodosState> emit) {
+    final state = this.state;
+    if (state is TodoLoaded) {
+      emit(TodoLoaded(todos: List.from(state.todos)..add(event.todo)));
+    }
+  }
 
-  void _onUpdateTodos(UpdateTodos event, Emitter<TodosState> emit) {}
+  void _onUpdateTodos(UpdateTodos event, Emitter<TodosState> emit) {
+    final state = this.state;
+    if (state is TodoLoaded) {
+      List<Todo> todos = state.todos
+          .map((todo) => todo.id == event.todo.id ? event.todo : todo)
+          .toList();
+      emit(TodoLoaded(todos: todos));
+    }
+  }
 
-  void _onDeleteTodos(DeleteTodos event, Emitter<TodosState> emit) {}
+  void _onDeleteTodos(DeleteTodos event, Emitter<TodosState> emit) {
+    final state = this.state;
+    if (state is TodoLoaded) {
+      List<Todo> todos =
+          state.todos.where((todo) => todo.id != event.todo.id).toList();
+      emit(TodoLoaded(todos: todos));
+    }
+  }
 }

@@ -25,47 +25,51 @@ class HomeScreen extends StatelessWidget {
           )
         ],
       ),
-      body: BlocBuilder<TodosBloc, TodosState>(
-        builder: (context, state) {
-          if (state is TodoLoading) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          if (state is TodoLoaded) {
-            return Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: Text(
-                      "Pending To Dos:",
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: ListView.builder(
-                      itemCount: state.todos.length,
-                      itemBuilder: (context, index) {
-                        return _todoCard(state.todos[index]);
-                      },
-                    ),
-                  )
-                ],
-              ),
-            );
-          } else {
-            return const Center(child: Text("Something went wrong!"));
-          }
-        },
-      ),
+      body: _todos(),
     );
   }
 
-  Card _todoCard(Todo todo) {
+  BlocBuilder<TodosBloc, TodosState> _todos() {
+    return BlocBuilder<TodosBloc, TodosState>(
+      builder: (context, state) {
+        if (state is TodoLoading) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        if (state is TodoLoaded) {
+          return Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Text(
+                    "Pending To Dos:",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: state.todos.length,
+                    itemBuilder: (context, index) {
+                      return _todoCard(context, state.todos[index]);
+                    },
+                  ),
+                )
+              ],
+            ),
+          );
+        } else {
+          return const Center(child: Text("Something went wrong!"));
+        }
+      },
+    );
+  }
+
+  Card _todoCard(BuildContext context, Todo todo) {
     return Card(
       margin: const EdgeInsets.only(bottom: 8.0),
       child: Padding(
@@ -79,17 +83,20 @@ class HomeScreen extends StatelessWidget {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            Row(
-              children: [
-                IconButton(
-                  onPressed: () {},
-                  icon: const Icon(Icons.add_task),
-                ),
-                IconButton(
-                  onPressed: () {},
-                  icon: const Icon(Icons.cancel),
-                ),
-              ],
+            const Spacer(),
+            IconButton(
+              onPressed: () {
+                context.read<TodosBloc>().add(UpdateTodos(
+                      todo: todo.copyWith(isCompleted: true),
+                    ));
+              },
+              icon: const Icon(Icons.add_task),
+            ),
+            IconButton(
+              onPressed: () {
+                context.read<TodosBloc>().add(DeleteTodos(todo: todo));
+              },
+              icon: const Icon(Icons.cancel),
             )
           ],
         ),
